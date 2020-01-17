@@ -11,6 +11,10 @@ Generates a fresh ECDSA key pair on every execution.
 
 This has been built/pushed as `evertras/jwt-issuer`.  Expose port 8080 when using.
 
+```bash
+docker run --rm -it -p 8080:8080 evertras/jwt-issuer
+```
+
 ## Endpoints
 
 ### /generate
@@ -31,7 +35,7 @@ curl -s -H "X-User-ID: myfakeid" localhost:8080/generate
 ### /check
 
 Checks a token given in the Authorization header as a bearer token.  Returns 200
-if valid and writes the user's name as the response, returns 401 otherwise.
+if valid and writes the token data in the response body, returns 401 otherwise.
 
 ### /jwks
 

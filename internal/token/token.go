@@ -59,7 +59,9 @@ func New(userID string) (string, error) {
 
 	token.Set(jwt.IssuedAtKey, now.Unix())
 	token.Set(jwt.ExpirationKey, now.Add(tokenDuration).Unix())
-	token.Set("UserID", userID)
+	token.Set(jwt.IssuerKey, "evertras/jwt-issuer")
+	token.Set(jwt.SubjectKey, userID)
+	token.Set("customgreeting", "hello")
 
 	signed, err := token.Sign(jwa.ES256, privateKey)
 
