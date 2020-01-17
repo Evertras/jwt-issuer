@@ -7,6 +7,10 @@ and self-contained as possible with as little fluff as possible.
 
 Generates a fresh ECDSA key pair on every execution.  
 
+## Docker
+
+This has been built/pushed as `evertras/jwt-issuer`.  Expose port 8080 when using.
+
 ## Endpoints
 
 ### /generate
