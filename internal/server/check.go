@@ -17,7 +17,7 @@ func checkHandler() func(w http.ResponseWriter, r *http.Request) {
 		authorization = strings.TrimPrefix(authorization, "bearer ")
 		authorization = strings.TrimSpace(authorization)
 
-		claim, err := token.Parse(authorization)
+		claim, err := token.Parse(strings.NewReader(authorization))
 
 		if err != nil {
 			log.Println("Failed to parse token:", err)

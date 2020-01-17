@@ -4,15 +4,18 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
+	"encoding/json"
+	"io"
 	"log"
-	"strings"
 	"time"
 
 	"github.com/lestrrat-go/jwx/jwa"
+	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/lestrrat-go/jwx/jwt"
 )
 
 var privateKey *ecdsa.PrivateKey = nil
+var jwkJson string
 
 func init() {
 	var err error
@@ -21,6 +24,20 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	key, err := jwk.New(&privateKey.PublicKey)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	raw, err := json.Marshal(key)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	jwkJson = string(raw)
 }
 
 // TODO: make this config
@@ -29,6 +46,10 @@ const tokenDuration = time.Hour * 10
 type Claim struct {
 	UserID string `json:"userId"`
 	jwt.Token
+}
+
+func JWKJson() string {
+	return jwkJson
 }
 
 func New(userID string) (string, error) {
@@ -45,6 +66,6 @@ func New(userID string) (string, error) {
 	return string(signed), err
 }
 
-func Parse(token string) (*jwt.Token, error) {
-	return jwt.Parse(strings.NewReader(token), jwt.WithVerify(jwa.ES256, &privateKey.PublicKey))
+func Parse(token io.Reader) (*jwt.Token, error) {
+	return jwt.Parse(token, jwt.WithVerify(jwa.ES256, &privateKey.PublicKey))
 }

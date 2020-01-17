@@ -1,6 +1,9 @@
 package token
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 const testUser = "testUser"
 
@@ -25,7 +28,7 @@ func TestTokenCreatesAndParses(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	parsed, err := Parse(token)
+	parsed, err := Parse(strings.NewReader(token))
 
 	if err != nil {
 		t.Fatal(err)

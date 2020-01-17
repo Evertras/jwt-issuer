@@ -18,6 +18,7 @@ func New(addr string) Server {
 
 	router.HandleFunc("/generate", generateHandler())
 	router.HandleFunc("/check", checkHandler())
+	router.HandleFunc("/jwks", jwkHandler())
 
 	return &server{
 		httpServer: &http.Server{
