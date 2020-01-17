@@ -17,6 +17,7 @@ func New(addr string) Server {
 	router := http.NewServeMux()
 
 	router.HandleFunc("/generate", generateHandler())
+	router.HandleFunc("/check", checkHandler())
 
 	return &server{
 		httpServer: &http.Server{
