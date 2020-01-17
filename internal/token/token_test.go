@@ -31,11 +31,7 @@ func TestTokenCreatesAndParses(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err = parsed.Valid(); err != nil {
-		t.Fatal(err)
-	}
-
-	if parsed.UserID != testUser {
-		t.Fatalf("Expected user ID %q but got %q", testUser, parsed.UserID)
+	if userID, exists := parsed.Get("UserID"); !exists || userID != testUser {
+		t.Fatalf("Expected user ID %q but got %q", testUser, userID)
 	}
 }

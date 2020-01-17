@@ -5,9 +5,11 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"log"
+	"strings"
 	"time"
 
-	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/lestrrat-go/jwx/jwa"
+	"github.com/lestrrat-go/jwx/jwt"
 )
 
 var privateKey *ecdsa.PrivateKey = nil
@@ -26,39 +28,23 @@ const tokenDuration = time.Hour * 10
 
 type Claim struct {
 	UserID string `json:"userId"`
-	jwt.StandardClaims
+	jwt.Token
 }
 
 func New(userID string) (string, error) {
 	now := time.Now()
 
-	claims := Claim{
-		UserID: userID,
-		StandardClaims: jwt.StandardClaims{
-			IssuedAt:  now.Unix(),
-			ExpiresAt: now.Add(tokenDuration).Unix(),
-		},
-	}
+	token := jwt.New()
 
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
+	token.Set(jwt.IssuedAtKey, now.Unix())
+	token.Set(jwt.ExpirationKey, now.Add(tokenDuration).Unix())
+	token.Set("UserID", userID)
 
-	return token.SignedString(privateKey)
+	signed, err := token.Sign(jwa.ES256, privateKey)
+
+	return string(signed), err
 }
 
-func Parse(token string) (*Claim, error) {
-	claims := &Claim{}
-
-	t, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
-		return &privateKey.PublicKey, nil
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	if claims, ok := t.Claims.(*Claim); ok && t.Valid {
-		return claims, nil
-	}
-
-	return nil, err
+func Parse(token string) (*jwt.Token, error) {
+	return jwt.Parse(strings.NewReader(token), jwt.WithVerify(jwa.ES256, &privateKey.PublicKey))
 }
